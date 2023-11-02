@@ -1,4 +1,5 @@
 #Movie Recommender script
+# https://medium.com/analytics-vidhya/web-scraping-with-python-and-object-oriented-programming-14638a231f14
 
 from bs4 import BeautifulSoup
 import requests
@@ -28,3 +29,14 @@ ratings = [b.attrs.get('data-value') for b in soup.select('td.posterColumn span[
 years = soup.select('span.secondaryInfo')
 #Temoporary array to store class instances
 _temp_ = []
+
+for index in range(0, len(movies)):
+     movie_string = movies[index].get_text()
+     movie = (' '.join(movie_string.split()).replace('.', ''))
+     movie_title = movie[len(str(index))+1:-7]
+     year = years[index].get_text()
+     position = index+1
+     movie_instances = ExtractMovies(
+         movie_title, year, crew[index], first2(ratings[index]))
+     _temp_.append(movie_instances)
+
