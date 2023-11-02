@@ -40,3 +40,10 @@ for index in range(0, len(movies)):
          movie_title, year, crew[index], first2(ratings[index]))
      _temp_.append(movie_instances)
 
+random.shuffle(_temp_)
+i=1
+for obj in _temp_:
+    print(i, "|", obj.title, '\n', obj.year,'\n', obj.star, '\n', obj.ratings, '\n')
+    i=i+1
+    if(i==11)
+        break
