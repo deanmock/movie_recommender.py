@@ -51,7 +51,7 @@ response = session.get('https://www.imdb.com/chart/top/', headers={'User-Agent':
 soup = BeautifulSoup(response.text, 'html.parser')
 
 
-
+raw_titles = soup.findAll(class_="ipc-title__text")
 #THIS IS WORKING. Just need to make it not so ugly. Less lines, same function. 
 def get_titles(soup):
     raw_titles = soup.findAll(class_="ipc-title__text")
@@ -63,8 +63,19 @@ def get_titles(soup):
     print(titles)
     return titles
 
+#DRY - this function is the same as above but im hoping it will replace it by being able to be used with
+# more than just the titles. I want this to be a text cleaning function for ratings, titles, years, etc
+#works for title, years, ratings, time. Not for link. Might need to build separate function for links
+def get_text(raw):
+    text = []
+    for i in raw:
+        text.append(i.text)
+     # printing here to validate it works   
+    print(text)
+    return text
 
-get_titles(soup)
+titles = get_text(soup)
+titles = titles[2:252]
 
 #TODO - parse all these lists and tame the text
 links = soup.findAll(class_="ipc-title-link-wrapper")
