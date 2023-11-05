@@ -10,6 +10,7 @@
 #Re is a regular expressions library that we may not actually need...tbd
 #random is a library that allows us to use a random method
 from bs4 import BeautifulSoup
+import pprint
 import requests
 import re
 import random
@@ -43,21 +44,29 @@ def first2(s):
 
 ##to see what it looks like after you parse the html with Beautiful Soup, run this:
 # soup = BeautifulSoup(response.text, 'html.parser')
-# print(soup)
+# print(soup.prettify())
 
 session = requests.Session()
 response = session.get('https://www.imdb.com/chart/top/', headers={'User-Agent': 'Mozilla/5.0'})
 soup = BeautifulSoup(response.text, 'html.parser')
 
-##The below code seems to be outdated/broken. I'm going to rewrite it so that it actually works. 
-
-##TODO: Parse movies, links, ratings, year from soup variable
-
-movies = soup.findAll(class_="ipc-title__text")
-#Needs parsing
-#TODO: Tame this text via a function
 
 
+#THIS IS WORKING. Just need to make it not so ugly. Less lines, same function. 
+def get_titles(soup):
+    raw_titles = soup.findAll(class_="ipc-title__text")
+    raw_titles = raw_titles[2:252]
+    titles = []
+    for title in raw_titles:
+        titles.append(title.text)
+     # printing here to validate it works   
+    print(titles)
+    return titles
+
+
+get_titles(soup)
+
+#TODO - parse all these lists and tame the text
 links = soup.findAll(class_="ipc-title-link-wrapper")
 years = soup.findAll(class_="sc-c7e5f54-8 hgjcbi cli-title-metadata-item")
 ratings = soup.findAll(class_="ipc-rating-star ipc-rating-star--base ipc-rating-star--imdb ratingGroup--imdb-rating")
