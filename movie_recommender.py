@@ -3,7 +3,8 @@
 # This program looks like it needs to be fixed. No longer seems to work.
 
 #STEP 1: we are importing the libraries we need. Beautiful Soup is a python webscraping library.
-# (Webscraping is basically using a program to copy the html of a webpage)
+# (Webscraping is basically using a program to copy the html of a webpage and then taking what you want
+# from it)
 #Requests is a library that allows us to request an HTML page
 #BeautifulSOup is a library that allows us to format an html page once we have requested it
 #(Formatting meaning we can clean up the 'raw text' from the HTML response)
@@ -15,6 +16,8 @@ import requests
 import re
 import random
 
+"""
+#WE WILL COME BACK TO THIS ONCE WE HAVE PARSED THE WEB PAGE
 #STEP 2: make Python class for declaring movie attributes. 
 class ExtractMovies(object):      
     def __init__(self, title, year,  star, ratings ):
@@ -25,6 +28,7 @@ class ExtractMovies(object):
         self.ratings = ratings
 
 print(ExtractMovies)
+"""
         
 #function to make ratings to two decimal places
 #Not sure if we will actually need this
@@ -32,69 +36,61 @@ def first2(s):
     return s[:4]
 
 #STEP 3: Get the web page in its raw, untamed text format
-
-
 #getting the web page specified below, passing it the mozilla user agent so it doesn't block us from
 # accessing the page, and then storing the page in a 'response' variable
 
 # If you wanna see what this looks like, open the python interpretor and run this:
-### session = requests.Session()
-## response = session.get('https://www.imdb.com/chart/top/', headers={'User-Agent': 'Mozilla/5.0'})
-## print(response.text)
+"""
+session = requests.Session()
+response = session.get('https://www.imdb.com/chart/top/', headers={'User-Agent': 'Mozilla/5.0'})
+print(response.text)
+"""
 
 ##to see what it looks like after you parse the html with Beautiful Soup, run this:
-# soup = BeautifulSoup(response.text, 'html.parser')
-# print(soup)
+"""
+soup = BeautifulSoup(response.text, 'html.parser')
+print(soup)
+"""
 
+#Grabbing web page, parsing it with BS, and storing it in soup variable
 session = requests.Session()
 response = session.get('https://www.imdb.com/chart/top/', headers={'User-Agent': 'Mozilla/5.0'})
 soup = BeautifulSoup(response.text, 'html.parser')
 
-
+#I inspected the html and narrowed it down to the classes that contain the text we are after
 raw_titles = soup.findAll(class_="ipc-title__text")
 raw_details = soup.findAll(class_="sc-c7e5f54-8 hgjcbi cli-title-metadata-item")
-#raw_ratings = soup.findAll(class_="ipc-rating-star ipc-rating-star--base ipc-rating-star--imdb ratingGroup--imdb-rating")
-#THIS IS WORKING. Just need to make it not so ugly. Less lines, same function. 
+raw_stars = soup.findAll(class_="ipc-rating-star ipc-rating-star--base ipc-rating-star--imdb ratingGroup--imdb-rating")
 
-#Note about below: using quotation marks 3 times on either side of a block of code makes it dormant
-# I don't think I'll need below function but I'm keeping it around for reference at the moment
-"""
-def get_titles(soup): 
-    raw_titles = soup.findAll(class_="ipc-title__text")
-    raw_titles = raw_titles[2:252]
-    titles = []
-    for title in raw_titles:
-        titles.append(title.text)
-     # printing here to validate it works   
-    print(titles)
-    return titles
-    """
-
-#DRY - this function is the same as above but im hoping it will replace it by being able to be used with
-# more than just the titles. I want this to be a text cleaning function for ratings, titles, years, etc
-#works for title, years, ratings, time. Not for link. Might need to build separate function for links
+#function that parses text
 def get_text(raw):
     text = []
     for i in raw:
         text.append(i.text)
-     # printing here to validate it works   
+     # printing here for testing purposes to validate it works   
     print(text)
     return text
 
-#make titles list
-#Works
+#running the raw titles text through the function to trim it down
 titles = get_text(raw_titles)
+#narrowing the titles list down to the 250 movies we are after (needed to get rid of some extra text)
 titles = titles[2:252]
 
-#make years list
-#works
-raw_years = get_text(raw_details)
+
+#extract years from the details text that contains year, rating, runtime
+# then we are going to use a regular expression match to find all the text that resembles a year
 years = []
-for year in raw_years:
+for year in get_text(raw_details):
     if re.match("^[12][0-9]{3}$", year):
         years.append(year)
 
-    
+
+
+# ------------------------------------------------------------------------------------
+# EVERYTHING BELOW HERE DOESN"T WORK
+
+#TODO - problem. This would work except for the fact that 1 damn movie is missing its mpaa rating and its throwing
+# everything else off.
 #ratings list
 raw_ratings = get_text(raw_details)
 options = ['G', 'PG', 'PG-13', 'R', 'TV-MA', 'NR','UR', 'M', 'TV-G', 'TV-PG', 'TV-14', 'NC-17', 'X', 'GP', 'Not Rated', '18+', 'Unrated', 'Passed', 'Approved']
