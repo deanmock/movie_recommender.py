@@ -44,7 +44,7 @@ def first2(s):
 
 ##to see what it looks like after you parse the html with Beautiful Soup, run this:
 # soup = BeautifulSoup(response.text, 'html.parser')
-# print(soup.prettify())
+# print(soup)
 
 session = requests.Session()
 response = session.get('https://www.imdb.com/chart/top/', headers={'User-Agent': 'Mozilla/5.0'})
@@ -52,8 +52,14 @@ soup = BeautifulSoup(response.text, 'html.parser')
 
 
 raw_titles = soup.findAll(class_="ipc-title__text")
+raw_details = soup.findAll(class_="sc-c7e5f54-8 hgjcbi cli-title-metadata-item")
+#raw_ratings = soup.findAll(class_="ipc-rating-star ipc-rating-star--base ipc-rating-star--imdb ratingGroup--imdb-rating")
 #THIS IS WORKING. Just need to make it not so ugly. Less lines, same function. 
-def get_titles(soup):
+
+#Note about below: using quotation marks 3 times on either side of a block of code makes it dormant
+# I don't think I'll need below function but I'm keeping it around for reference at the moment
+"""
+def get_titles(soup): 
     raw_titles = soup.findAll(class_="ipc-title__text")
     raw_titles = raw_titles[2:252]
     titles = []
@@ -62,6 +68,7 @@ def get_titles(soup):
      # printing here to validate it works   
     print(titles)
     return titles
+    """
 
 #DRY - this function is the same as above but im hoping it will replace it by being able to be used with
 # more than just the titles. I want this to be a text cleaning function for ratings, titles, years, etc
@@ -74,14 +81,48 @@ def get_text(raw):
     print(text)
     return text
 
-titles = get_text(soup)
+#make titles list
+#Works
+titles = get_text(raw_titles)
 titles = titles[2:252]
 
-#TODO - parse all these lists and tame the text
-links = soup.findAll(class_="ipc-title-link-wrapper")
-years = soup.findAll(class_="sc-c7e5f54-8 hgjcbi cli-title-metadata-item")
-ratings = soup.findAll(class_="ipc-rating-star ipc-rating-star--base ipc-rating-star--imdb ratingGroup--imdb-rating")
+#make years list
+#works
+raw_years = get_text(raw_details)
+years = []
+for year in raw_years:
+    if re.match("^[12][0-9]{3}$", year):
+        years.append(year)
+
+    
+#ratings list
+raw_ratings = get_text(raw_details)
+options = ['G', 'PG', 'PG-13', 'R', 'TV-MA', 'NR','UR', 'M', 'TV-G', 'TV-PG', 'TV-14', 'NC-17', 'X', 'GP', 'Not Rated', '18+', 'Unrated', 'Passed', 'Approved']
+ratings = []
+for rating in raw_ratings:
+    if rating in options:
+        ratings.append(rating)
+
+#make time list
+times = []
+for i in raw_ratings:
+    if i not in options and i not in years:
+        times.append(i)
+"""raw_runtimes = get_text(raw_details)
+runtimes = []
+for runtime in raw_runtimes:
+    if re.match("m$", runtime):
+        runtimes.append(runtime)
+"""
+[]
+
+
 #print(soup.findAll(class_="ipc-rating-star ipc-rating-star--base ipc-rating-star--imdb ratingGroup--imdb-rating"))
+
+
+#TODO - parse links
+links = soup.findAll(class_="ipc-title-link-wrapper")
+
 
 
 #Temoporary array to store class instances
