@@ -42,7 +42,7 @@ soup = BeautifulSoup(response.text, 'html.parser')
 #contains titles
 raw_titles = soup.findAll(class_="ipc-title__text")
 #includes runtime, year, mpaa rating
-raw_details = soup.findAll(class_="sc-c7e5f54-8 hgjcbi cli-title-metadata-item")
+raw_details = soup.findAll(class_="sc-c7e5f54-8 fiTXuB cli-title-metadata-item")
 #contains stars out of 10
 raw_stars = soup.findAll(class_="ipc-rating-star ipc-rating-star--base ipc-rating-star--imdb ratingGroup--imdb-rating")
 #links
