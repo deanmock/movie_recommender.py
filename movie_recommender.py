@@ -33,40 +33,43 @@ print(ExtractMovies)
 #STEP 3: Get the web page in its raw, untamed text format
 #getting the web page specified below, passing it the mozilla user agent so it doesn't block us from
 # accessing the page, and then storing the page in a 'response' variable
-
-# If you wanna see what this looks like, open the python interpretor and run this:
-"""
-session = requests.Session()
-response = session.get('https://www.imdb.com/chart/top/', headers={'User-Agent': 'Mozilla/5.0'})
-print(response.text)
-"""
-
-##to see what it looks like after you parse the html with Beautiful Soup, run this:
-"""
-soup = BeautifulSoup(response.text, 'html.parser')
-print(soup)
-"""
-
 #Grabbing web page, parsing it with BS, and storing it in soup variable
 session = requests.Session()
 response = session.get('https://www.imdb.com/chart/top/', headers={'User-Agent': 'Mozilla/5.0'})
 soup = BeautifulSoup(response.text, 'html.parser')
 
 #I inspected the html and narrowed it down to the elements that contain the text we are after
-
 #contains titles
 raw_titles = soup.findAll(class_="ipc-title__text")
 #includes runtime, year, mpaa rating
 raw_details = soup.findAll(class_="sc-c7e5f54-8 hgjcbi cli-title-metadata-item")
 #contains stars out of 10
 raw_stars = soup.findAll(class_="ipc-rating-star ipc-rating-star--base ipc-rating-star--imdb ratingGroup--imdb-rating")
+#links
+raw_links = soup.findAll(class_="ipc-title-link-wrapper")
 
+#parse out the links
+links = []
+new = []
+for i in soup.find_all('a', href=True):
+    links.append(i['href'])
+    new = [i for i in links if '/title' in i]
+    new[2:252]
+    #must have /title. Don't think ranging the results will work.
+print(new)
+#this works but the length of the list is 501 not 250...so maybe there are duplicate links? Maybe one
+# for the movie image, one for the title text, one for the 'more info' button? 
+if len(new) > len(set(new)):
+    print('not unique')
+    
 #function that parses text
 def get_text(raw):
     text = []
     for i in raw:
         text.append(i.text)
     return text
+
+
 
 #running the raw titles text through the function to trim it down
 #then on next line, narrowing the titles list down to the 250 movies we are after (needed to get rid of some extra text)
@@ -102,6 +105,8 @@ runtimes = []
 for i in get_text(raw_details):
     if any (regex.match(i) for regex in [pattern1, pattern2, pattern3, pattern4]):
         runtimes.append(i)
+
+
 
 #####################################################################################################
 ##      EVERYTHING BELOW HERE IS STILL IN PROGRESS. 
