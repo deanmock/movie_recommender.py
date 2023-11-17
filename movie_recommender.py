@@ -15,20 +15,19 @@ import requests
 import re
 import random
 
-"""
+
 #WE WILL COME BACK TO THIS ONCE WE HAVE PARSED THE WEB PAGE
 #STEP 2: make Python class for declaring movie attributes. 
 class ExtractMovies(object):      
     def __init__(self, title, year, runtime, star, ratings ):
-        self.position = position
         self.title = title
         self.year = year
         self.runtime = runtime
         self.star = star
         self.ratings = ratings
 
-print(ExtractMovies)
-"""
+#print(ExtractMovies)
+
 
 #STEP 3: Get the web page in its raw, untamed text format
 #getting the web page specified below, passing it the mozilla user agent so it doesn't block us from
@@ -45,22 +44,7 @@ raw_titles = soup.findAll(class_="ipc-title__text")
 raw_details = soup.findAll(class_="sc-c7e5f54-8 fiTXuB cli-title-metadata-item")
 #contains stars out of 10
 raw_stars = soup.findAll(class_="ipc-rating-star ipc-rating-star--base ipc-rating-star--imdb ratingGroup--imdb-rating")
-#links
-raw_links = soup.findAll(class_="ipc-title-link-wrapper")
 
-#parse out the links
-links = []
-new = []
-for i in soup.find_all('a', href=True):
-    links.append(i['href'])
-    new = [i for i in links if '/title' in i]
-    new[2:252]
-    #must have /title. Don't think ranging the results will work.
-print(new)
-#this works but the length of the list is 501 not 250...so maybe there are duplicate links? Maybe one
-# for the movie image, one for the title text, one for the 'more info' button? 
-if len(new) > len(set(new)):
-    print('not unique')
     
 #function that parses text
 def get_text(raw):
@@ -115,24 +99,15 @@ for i in get_text(raw_details):
 #TODO - problem. This would work except for the fact that 1 damn movie is missing its mpaa rating and its throwing
 # everything else off.
 #ratings list
-"""
 
-raw_ratings = get_text(raw_details)
-options = ['G', 'PG', 'PG-13', 'R', 'TV-MA', 'NR','UR', 'M', 'TV-G', 'TV-PG', 'TV-14', 'NC-17', 'X', 'GP', 'Not Rated', '18+', 'Unrated', 'Passed', 'Approved']
 ratings = []
-for rating in raw_ratings:
-    if rating in options:
-        ratings.append(rating)
+for i in get_text(raw_details):
+    if i not in runtimes or years:
+        ratings.append(i)
 
-"""
 
 #print(soup.findAll(class_="ipc-rating-star ipc-rating-star--base ipc-rating-star--imdb ratingGroup--imdb-rating"))
 
-
-#TODO - parse links
-"""
-links = soup.findAll(class_="ipc-title-link-wrapper")
-"""
 
 #STEP 4: PUT ALL THE VARIOUS DATA POINTS TOGETHER INTO MOVIE OBJECTS
 #Temoporary array to store class instances
